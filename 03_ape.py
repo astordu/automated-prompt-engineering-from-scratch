@@ -8,6 +8,7 @@ import datetime
 import aioconsole
 from prompt_evaluator import PromptEvaluator
 import backoff
+from openai import OpenAI
 
 
 class APD:
@@ -21,7 +22,7 @@ class APD:
         self.safety_settings = safety_settings
 
         # Initialize the generation model
-        self.generation_model = GenerativeModel(self.generation_model_name)
+        self.generation_model = self.generation_model_name
 
         # Create the "runs" folder if it doesn't exist
         self.runs_folder = "runs"
@@ -90,13 +91,26 @@ class APD:
 
     @backoff.on_exception(backoff.expo, Exception, max_tries=5)
     async def generate_with_backoff(self, metaprompt):
-        response = self.generation_model.generate_content(
-            metaprompt,
-            generation_config=self.generation_config,
-            safety_settings=self.safety_settings,
+        # response = self.generation_model.generate_content(
+        #     metaprompt,
+        #     generation_config=self.generation_config,
+        #     safety_settings=self.safety_settings,
+        #     stream=False,
+        # )
+        # return response
+
+        client = OpenAI(api_key="你的api_key", base_url="https://api.deepseek.com")
+
+        response = client.chat.completions.create(
+            model="deepseek-chat",
+            messages=[
+                {"role": "system", "content": metaprompt},
+            ],
             stream=False,
+            temperature= 0.7
         )
-        return response
+        print(f"review_response: {response.choices[0].message.content}")
+        return response.choices[0].message.content
 
     async def main(self):
         prompt_accuracies = []
@@ -123,10 +137,10 @@ class APD:
                     continue
                 
                 await aioconsole.aprint("-" * 150)
-                await aioconsole.aprint(response.text)
+                await aioconsole.aprint(response)
                 await aioconsole.aprint("-" * 150)
                 
-                match = re.search(r'\[\[(.*?)\]\]', response.text, re.DOTALL)
+                match = re.search(r'\[\[(.*?)\]\]', response, re.DOTALL)
                 if match:
                     new_prompt = match.group(1)
                 else:
@@ -191,7 +205,7 @@ class APD:
 
 if __name__ == "__main__":
     num_prompts = 5
-    starting_prompt = "Solve the given problem about geometric shapes. Think step by step."
+    starting_prompt = "根据问题，请给出正确答案。一步步思考，最终得出正确答案。"
     
     df_train = pd.read_csv('train.csv')  # Load your training data
 

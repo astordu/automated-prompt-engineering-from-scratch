@@ -28,5 +28,5 @@ if __name__ == "__main__":
         df_train, target_model_name, target_model_config, review_model_name, review_model_config, safety_settings, review_prompt_template_path
     )
     
-    prompt = input("Please enter the prompt for evaluation: ")
+    prompt = "在回答历史问题时，首先全面回顾相关历史背景和事件，确保对每个选项有深入的理解。接着，逐步推理每个选项的可能性，排除不符合条件的选项。最后，基于逻辑推理和历史事实，确定最符合条件的答案，并详细解释选择该答案的理由。" 
     asyncio.run(evaluator.main(prompt))

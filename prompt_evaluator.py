@@ -1,8 +1,9 @@
 import asyncio
 import pandas as pd
-from vertexai.generative_models import GenerativeModel
+# from vertexai.generative_models import GenerativeModel
 from tqdm.asyncio import tqdm_asyncio
 import backoff
+from openai import OpenAI
 
 class ReviewModelError(Exception):
     """Custom exception for review model errors."""
@@ -18,33 +19,62 @@ class PromptEvaluator:
         self.safety_settings = safety_settings
         self.review_prompt_template_path = review_prompt_template_path
 
-        self.target_model = GenerativeModel(self.target_model_name)
-        self.review_model = GenerativeModel(self.review_model_name)
+        self.target_model = self.target_model_name
+        self.review_model = self.review_model_name
 
     @backoff.on_exception(backoff.expo, Exception, max_tries=5)
     async def generate_target_model_response(self, question, prompt):
-        target_model = GenerativeModel(
-            self.target_model_name,
-            generation_config=self.target_model_config,
-            safety_settings=self.safety_settings,
-            system_instruction=prompt
+        # target_model = GenerativeModel(
+        #     self.target_model_name,
+        #     generation_config=self.target_model_config,
+        #     safety_settings=self.safety_settings,
+        #     system_instruction=prompt
+        # )
+
+        client = OpenAI(api_key="你的api_key", base_url="https://api.deepseek.com")
+
+        response = client.chat.completions.create(
+            model="deepseek-chat",
+            messages=[
+                {"role": "system", "content": prompt},
+                {"role": "user", "content": question},
+            ],
+            stream=False,
+            temperature=0
         )
 
-        response = await target_model.generate_content_async(
-            question,
-            stream=False,
-        )
-        return response.text
+        # print(f"回答的答案是：{response.choices[0].message.content}")
+        return response.choices[0].message.content
+    
+        # print(response.choices[0].message.content)
+        
+        # response = await target_model.generate_content_async(
+        #     question,
+        #     stream=False,
+        # )
+        # return response.text
 
     @backoff.on_exception(backoff.expo, Exception, max_tries=5)
     async def generate_review_model_response(self, review_prompt):
-        review_response = await self.review_model.generate_content_async(
-            [review_prompt],
-            generation_config=self.review_model_config,
-            safety_settings=self.safety_settings,
-            stream=False,
-        )
-        return review_response.text.strip().lower()
+            client = OpenAI(api_key="你的api_key", base_url="https://api.deepseek.com")
+
+            response = client.chat.completions.create(
+                model="deepseek-chat",
+                messages=[
+                    {"role": "system", "content": review_prompt},
+                ],
+                stream=False,
+                temperature= 0
+            )
+            # print(f"回答正确吗？: {response.choices[0].message.content}")
+            return response.choices[0].message.content
+        # review_response = await self.review_model.generate_content_async(
+        #     [review_prompt],
+        #     generation_config=self.review_model_config,
+        #     safety_settings=self.safety_settings,
+        #     stream=False,
+        # )
+        # return review_response.text.strip().lower()
 
     async def generate_and_review(self, row, prompt):
         try:
@@ -65,10 +95,10 @@ class PromptEvaluator:
                 raise ReviewModelError("Target model did not return a valid response.")
 
             # Assert that the review model returns either 'true' or 'false'
-            if review_result not in ['true', 'false']:
+            if review_result not in ['true', 'false','True', 'False']:
                 raise ReviewModelError("Review model did not return a valid response.")
 
-            is_correct = review_result == 'true'  # Check if the response is 'True'
+            is_correct = review_result == 'true' or review_result == 'True'  # Check if the response is 'True'
 
             return row.name, model_response, is_correct 
         except ReviewModelError as e:
@@ -122,3 +152,17 @@ class PromptEvaluator:
             print("The program has terminated due to an invalid response from the review model.")
         except Exception as e:
             print(f"The program has terminated due to an unexpected error: {e}")
+
+
+if __name__ == "__main__":
+    client = OpenAI(api_key="你的api_key", base_url="https://api.deepseek.com")
+
+    response = client.chat.completions.create(
+        model="deepseek-chat",
+        messages=[
+            {"role": "system", "content": "1+1等于几呀"}
+        ],
+        stream=False,
+        temperature= 1
+    )
+    print(response.choices[0].message.content)

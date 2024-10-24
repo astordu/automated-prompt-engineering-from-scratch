@@ -1,17 +1,18 @@
 <EXPLANATION>
-I have some prompts along with their corresponding accuracies.
-The prompts are arranged in ascending order based on their accuracy, where higher accuracy indicate better quality.
+我会提供一些提示词及其对应的准确率。
+这些提示词按照准确率从低到高排列，准确率越高表示质量越好。
 </EXPLANATION>
 
 <PROMPTS>
 {prompt_scores}
 </PROMPTS>
 
-Each prompt was used together with a problem statement around geometric shapes.
+每个提示词都是关于如何更好的回答历史问题的，并给出正确答案的。
 
 <EXAMPLE>
 <QUESTION>
-This SVG path element <path d="M 55.57,80.69 L 57.38,65.80 M 57.38,65.80 L 48.90,57.46 M 48.90,57.46 L 45.58,47.78 M 45.58,47.78 L 53.25,36.07 L 66.29,48.90 L 78.69,61.09 L 55.57,80.69"/> draws a Options: (A) circle (B) heptagon (C) hexagon (D) kite (E) line (F) octagon (G) pentagon (H) rectangle (I) sector (J) triangle
+问题：中国古代有一个统一王朝，它最先在全国范围内推行了郡县制，建立起中央集权制的政治模式。据此判断，这个王朝是 选项：(A)西周 (B)秦朝 (C)东汉 (D)明朝
+答案：从A到D, 我们应选择
 </QUESTION>
 <ANSWER>
 (B)
@@ -19,17 +20,17 @@ This SVG path element <path d="M 55.57,80.69 L 57.38,65.80 M 57.38,65.80 L 48.90
 </EXAMPLE>
 
 <TASK>
-Write a new prompt that will achieve an accuracy as high as possible and that is different from the old ones.
+编写一个新的提示词，以尽可能高的准确率完成任务，并且与之前的提示词不同。
 </TASK>
 
 
 <RULES>
-- It is very important that the new prompt is distinct from ALL the old ones!
-- Ensure that you analyse the prompts with a high accuracy and reuse the patterns that worked in the past
-- Ensure that you analyse the prompts with a low accuracy and avoid the patterns that didn't worked in the past
-- Think out loud before creating the prompt. Describe what has worked in the past and what hasn't. Only then create the new prompt.
-- Use all available information like prompt length, formal/informal use of language, etc for your analysis.
-- Be creative, try out different ways of prompting the model. You may even come up with hypothetical scenarios that might improve the accuracy.
-- You are generating system prompts. This means that there should be no placeholders in the prompt, as they cannot be filled at runtime. Instead focus on general instructions that will help the model to solve the task.
-- Write your new prompt in double square brackets. Use only plain text for the prompt text and do not add any markdown (i.e. no hashtags, backticks, quotes, etc).
+- 新提示词必须与所有旧提示词明显不同，这一点非常重要！
+- 确保你分析高准确率的提示词，并重用过去有效的那部分模式
+- 确保你分析低准确率的提示词，并避免过去无效的那部分模式
+- 在创建提示词之前，先大声思考。描述过去哪些方法有效，哪些无效。只有在分析之后再创建新的提示词。
+- 使用所有可用的信息，如提示词的长度、正式/非正式语言的使用等进行分析。
+- 要有创意，尝试不同的提示方式。你甚至可以设想一些可能提高准确率的假设场景。
+- 你正在生成系统提示词（system prompt）。这意味着提示词中不应有占位符，因为它们无法在运行时填充。相反，应专注于提供有助于模型完成任务的通用指令。
+- 将你的新提示词写在双中括号中。提示词文本仅使用纯文本，不要添加任何Markdown格式（即不要使用井号、反引号、引号等）。
 </RULES>
